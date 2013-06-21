@@ -56,7 +56,8 @@ def feedFwdBp(nn,X):
     mOnes = np.ones((Xiter.shape[0],1))
     for i in range(0, nn.l.size-1):
         Xiter = sigmoid(np.dot(np.hstack((mOnes,Xiter)),nn.getThetaLayer(nn.theta,i).T))
-    return Xiter.T
+    Xiter = Xiter.argmax(axis=1)
+    return Xiter
     
 def costGradient(t,nn,lamda):
     z = []
@@ -95,10 +96,14 @@ def costGradient(t,nn,lamda):
         m_D = np.dot(a[i].get().T, delta[i+1].get())
         D[i].set(m_D)
     
-    grad = (D[0].get()/m)
+    tL = nn.getThetaLayer(t,0)
+    treg = lamda/m * np.hstack((np.zeros((tL.shape[0],1)),tL[:,1:] ))
+    grad = ((D[0].get() + treg.T)/m)
     grad = grad.reshape(-1, order='F')
     for i in range(1, l_size-1):
-        grad = np.hstack((grad, (D[i].get()/m).reshape(-1, order='F')))
+        tL = nn.getThetaLayer(t,i)
+        treg = lamda/m * np.hstack((np.zeros((tL.shape[0],1)),tL[:,1:] ))
+        grad = np.hstack((grad, ((D[i].get()/m) + treg.T).reshape(-1, order='F')))
 
     return grad
     
@@ -126,7 +131,15 @@ def costFunction(t,nn,lamda):
     temp2 = -1.0 * nn.y.T * np.log(h)
     temp3 = temp2 - temp1 
     J_unreg = 1.0/m * np.sum(np.sum(temp3, axis=1))
-    return J_unreg
+    
+    J_reg = 0
+    for i in range(0,l_size-1):
+        theta_reg = nn.getThetaLayer(t,0) ** 2
+        theta_reg[:,0] = 0
+        J_reg = J_reg + (lamda / (2.0 * m)) * np.sum(np.sum(theta_reg))
+
+    J = J_unreg+J_reg    
+    return J
 
 def trainBp(nn, lamda, maxIter):
     """Train the initilized neural network by backpropogation. 
