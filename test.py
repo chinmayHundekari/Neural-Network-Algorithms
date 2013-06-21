@@ -31,7 +31,7 @@ input_layer_size  = 400;
 hidden_layer_size = 25;   
 num_labels = 10;          
 
-data = sio.loadmat('ex4data1.mat')
+data = sio.loadmat('numbers.mat')
 X = data['X']
 y = data['y'].reshape(-1) -1
 

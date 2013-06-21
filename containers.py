@@ -1,6 +1,6 @@
 import numpy as np
 
-EPSILON = 0.1
+EPSILON = 0.01
 
 class memObj:
     """A wrapper for objects.
@@ -101,7 +101,11 @@ class NN:
             NIL.
             """
         self.X = X
-        self.y = y
+        self.y = np.zeros((l[-1],y.size))
+        for i in range(0,y.size):
+            t = y[i]
+            self.y[t,i] = 1
+#        print self.y
         self.l = l
         self.layers_count = l.size
         self.theta = self.__randInit(l[0],l[1])
@@ -109,7 +113,9 @@ class NN:
         for i in range(1,l.size-1):
             pos = self.theta.size
             self.theta = np.hstack((self.theta,self.__randInit(l[i], l[i + 1])))
+#           print self.theta
             self.layers = np.vstack((self.layers, np.array((l[i+1],l[i]+1,pos))))
+#           print self.layers
         
     def __str__(self):
         return 'Inputs (%d,%d)\nOutputs (%d,%d)\nlayers %s' %(self.X.shape[0],self.X.shape[1],self.y.shape[0],self.y.shape[1],str(self.l))
