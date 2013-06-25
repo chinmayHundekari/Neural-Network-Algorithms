@@ -163,4 +163,23 @@ def trainBp(nn, lamda, maxIter):
     print "Time taken to train the network is ",endTime,"sec. with the final cost at ", J
     return J
 
+def analytics(bpNet,inputs,outputs):
+    feedFwd = bp.feedFwdBp(bpNet,inputs) 
+    accuracy = np.mean(feedFwd == outputs) * 100.0
+    print 'Accuracy: %r' %(accuracy)
+
+def boolAnalytics(bpNet,inputs,outputs):
+    feedFwd = feedFwdBp(bpNet,inputs) > 0.5
+    print np.sum(feedFwd[outputs])
+    truePos = np.sum(feedFwd[outputs]) *1.0
+    allpos = np.sum(outputs) *1.0
+    recall = truePos/allpos * 100.0
+    predpos = np.sum(feedFwd) *1.0
+    precision = truePos/predpos * 100.0
+    accuracy = np.mean(feedFwd == outputs) * 100.0
+    
+    
+    print 'Accuracy : %r' %(accuracy)
+    print 'Recall   : %r' %(recall)
+    print 'Precision: %r' %(precision)
     
